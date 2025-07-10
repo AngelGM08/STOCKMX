@@ -75,9 +75,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-// ------------------------
-// Página de Inventario
-// ------------------------
+
 class InventoryPage extends StatelessWidget {
   final List<String> products = [
     'Producto 1',
@@ -105,3 +103,12 @@ class InventoryPage extends StatelessWidget {
     );
   }
 }
+
+
+
+// ------------------------
+// git add .
+//git commit -m "Agrega pantalla de inventario"
+//git push
+
+// ------------------------
