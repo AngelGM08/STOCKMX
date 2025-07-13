@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'formularios/insumos.dart';
+import 'formularios/proveedores.dart';
+import 'formularios/productos.dart';
+import 'formularios/compras.dart';
+import 'formularios/produccion.dart';
 
 void main() {
   runApp(const MyApp());
@@ -73,40 +78,44 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _getMainContent() {
-    if (_selectedMenu == 'Inicio') {
-      return Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            Text(
-              'Bienvenido a la Tamalería "El Buen Sabor"',
-              style: Theme.of(context).textTheme.headlineMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            Image.asset(
-              'assets/images/tamales.jpg',
-              height: 250,
-              fit: BoxFit.cover,
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Gestiona eficientemente insumos, proveedores, productos, compras y producción de tamales con esta aplicación desarrollada en Flutter.',
-              style: TextStyle(fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      );
+    switch (_selectedMenu) {
+      case 'Insumos':
+        return const InsumosForm();
+      case 'Proveedores':
+        return const ProveedoresForm();
+      case 'Productos':
+        return const ProductosForm();
+      case 'Compras':
+        return const ComprasForm();
+      case 'Producción':
+        return const ProduccionForm();
+      case 'Inicio':
+      default:
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              Text(
+                'Bienvenido a la Tamalería "El Buen Sabor"',
+                style: Theme.of(context).textTheme.headlineMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              Image.asset(
+                'assets/images/tamales.jpg',
+                height: 250,
+                fit: BoxFit.cover,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Gestiona eficientemente insumos, proveedores, productos, compras y producción de tamales con esta aplicación desarrollada en Flutter.',
+                style: TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        );
     }
-
-    // Pantallas temporales de otras secciones
-    return Center(
-      child: Text(
-        'Vista: $_selectedMenu',
-        style: const TextStyle(fontSize: 24),
-      ),
-    );
   }
 }
