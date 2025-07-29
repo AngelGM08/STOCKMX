@@ -24,8 +24,10 @@ class _ComprasFormState extends State<ComprasForm> {
   List<ProductoModel> productos = [];
   String? selectedProductoId;
 
+  String? unidadSel;
+  final unidad = ['kg', 'pieza', 'ml'];
+
   final TextEditingController txtCantidad = TextEditingController();
-  final TextEditingController txtUnidad = TextEditingController();
   final TextEditingController txtTotal = TextEditingController();
   bool isLoading = false;
 
@@ -45,7 +47,7 @@ class _ComprasFormState extends State<ComprasForm> {
 
         setState(() {
           txtCantidad.text = compra.cantidad.toString();
-          txtUnidad.text = compra.unidad.toString();
+          unidadSel = compra.unidad.toString();
           txtTotal.text = compra.total.toString();
         });
       } else {
@@ -128,7 +130,7 @@ class _ComprasFormState extends State<ComprasForm> {
     if (selectedProveedorId == null ||
         selectedProductoId == null ||
         txtCantidad.text.isEmpty ||
-        txtUnidad.text.isEmpty ||
+        unidadSel == null ||
         txtTotal.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor, llena todos los campos')),
@@ -146,10 +148,12 @@ class _ComprasFormState extends State<ComprasForm> {
           'id_proveedor': selectedProveedorId,
           'id_producto': selectedProductoId,
           'cantidad': txtCantidad.text,
-          'unidad': txtUnidad.text,
+          'unidad': unidadSel,
           'total': txtTotal.text,
         }),
-        headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8'},
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
       );
 
       if (response.body == "ok") {
@@ -177,7 +181,9 @@ class _ComprasFormState extends State<ComprasForm> {
       final response = await http.post(
         Uri.parse('${Url.urlServer}/api/compra/eliminar'),
         body: jsonEncode(<String, dynamic>{'id': widget.idCompra}),
-        headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8'},
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
       );
 
       if (response.body == "ok") {
@@ -260,7 +266,7 @@ class _ComprasFormState extends State<ComprasForm> {
                         (prod) => prod.idProd.toString() == newValue,
                       );
                       precioUnitario = productoSel
-                        .precioU; // Asegúrate que precioU sea double
+                          .precioU; // Asegúrate que precioU sea double
                       // Recalcular total si ya hay cantidad escrita
                       if (txtCantidad.text.isNotEmpty) {
                         calcularTotal();
@@ -281,7 +287,16 @@ class _ComprasFormState extends State<ComprasForm> {
                 const Text('Cantidad: '),
                 TextFormField(controller: txtCantidad),
                 const Text('Unidad: '),
-                TextFormField(controller: txtUnidad),
+                DropdownButtonFormField(
+                  value: unidadSel,
+                  hint: const Text('Selecciona una unidad'),
+                  items: unidad
+                      .map(
+                        (rol) => DropdownMenuItem(value: rol, child: Text(rol)),
+                      )
+                      .toList(),
+                  onChanged: (value) => setState(() => unidadSel = value),
+                ),
                 const Text('Total: '),
                 TextFormField(controller: txtTotal),
 

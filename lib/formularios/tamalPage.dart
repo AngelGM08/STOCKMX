@@ -4,21 +4,23 @@ import 'package:http/http.dart' as http;
 import 'package:stockmx/drawer.dart';
 import 'package:stockmx/formularios/compraPage.dart';
 import 'package:stockmx/formularios/model/productoModel.dart';
+import 'package:stockmx/formularios/model/tamalModel.dart';
 import 'package:stockmx/formularios/model/url.dart';
+import 'package:stockmx/formularios/productoPage.dart';
 import 'package:stockmx/formularios/productos.dart';
 import 'package:stockmx/formularios/proveedorPage.dart';
-import 'package:stockmx/formularios/tamalPage.dart';
+import 'package:stockmx/formularios/tamales.dart';
 import 'package:stockmx/home.dart';
 
-class ProductoPage extends StatefulWidget {
-  const ProductoPage({super.key});
+class TamalPage extends StatefulWidget {
+  const TamalPage({super.key});
 
   @override
-  State<ProductoPage> createState() => _ProductoPageState();
+  State<TamalPage> createState() => _TamalPageState();
 }
 
-class _ProductoPageState extends State<ProductoPage> {
-  final String _selectedMenu = 'Productos';
+class _TamalPageState extends State<TamalPage> {
+  final String _selectedMenu = 'Tamales';
 
   /// 🔹 Manejo de navegación desde el Drawer
   void _onMenuSelected(String menu) {
@@ -32,13 +34,13 @@ class _ProductoPageState extends State<ProductoPage> {
         context,
         MaterialPageRoute(builder: (_) => const CompraPage()),
       );
-    } else if (menu == 'Tamales') {
+    } else if (menu == 'Productos') {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const TamalPage()),
+        MaterialPageRoute(builder: (_) => const ProductoPage()),
       );
-    } else if (menu == 'Productos') {
-      return; // ya estamos aquí
+    } else if (menu == 'Tamales') {
+      return;
     } else {
       Navigator.pushReplacement(
         context,
@@ -47,10 +49,10 @@ class _ProductoPageState extends State<ProductoPage> {
     }
   }
 
-  List<ProductoModel> productos = [];
+  List<TamalModel> tamales = [];
 
   /// 🔹 Obtiene productos desde la API
-  void fnGetProducto() async {
+  void fnGetTamal() async {
     http.Response response;
     if (Url.rol == 'Proveedor') {
       response = await http.post(
@@ -60,14 +62,14 @@ class _ProductoPageState extends State<ProductoPage> {
       );
     } else {
       response = await http.post(
-        Uri.parse('${Url.urlServer}/api/productos'),
+        Uri.parse('${Url.urlServer}/api/tamales'),
         headers: {'Content-Type': 'application/json; charset=UTF-8'},
       );
     }
 
-    Iterable mapProducto = jsonDecode(response.body);
-    productos = List<ProductoModel>.from(
-      mapProducto.map((model) => ProductoModel.fromJson(model)),
+    Iterable mapTamal = jsonDecode(response.body);
+    tamales = List<TamalModel>.from(
+      mapTamal.map((model) => TamalModel.fromJson(model)),
     );
 
     setState(() {});
@@ -75,15 +77,15 @@ class _ProductoPageState extends State<ProductoPage> {
 
   /// 🔹 Construye la lista de productos
   Widget _listViewProducto() {
-    if (productos.isEmpty) {
-      return const Center(child: Text('No hay productos disponibles'));
+    if (tamales.isEmpty) {
+      return const Center(child: Text('No hay tamales disponibles'));
     }
 
     return ListView.builder(
       padding: const EdgeInsets.all(8),
-      itemCount: productos.length,
+      itemCount: tamales.length,
       itemBuilder: (context, index) {
-        final producto = productos[index];
+        final tamal = tamales[index];
         return Card(
           margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
           shape: RoundedRectangleBorder(
@@ -92,25 +94,27 @@ class _ProductoPageState extends State<ProductoPage> {
           elevation: 3,
           child: ListTile(
             onTap: () {
-              if (Url.rol != 'Administrador' || Url.id == producto.idProd) {
+              if (Url.rol != 'Administrador' || Url.id == tamal.idT) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProductosForm(idProducto: producto.idProd),
+                    builder: (context) =>
+                        TamalesForm(idTamal: tamal.idT),
                   ),
                 );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text(
-                      'No tienes permiso para editar este producto.',
+                      'No tienes permiso para editar este tamal.',
                     ),
                   ),
                 );
               }
             },
-            title: Text(producto.nombreProd),
-            subtitle: Text('Descripción: ${producto.descripcion}\n''Precio: \$${producto.precioU.toStringAsFixed(2)}'),
+            title: Text(tamal.nomT),
+            subtitle: Text(
+              'Descripción: ${tamal.descripcion}'),
           ),
         );
       },
@@ -120,7 +124,7 @@ class _ProductoPageState extends State<ProductoPage> {
   @override
   void initState() {
     super.initState();
-    fnGetProducto();
+    fnGetTamal();
   }
 
   @override
@@ -134,7 +138,7 @@ class _ProductoPageState extends State<ProductoPage> {
 
       /// ✅ AppBar consistente
       appBar: AppBar(
-        title: const Text('Productos'),
+        title: const Text('Tamales'),
         backgroundColor: Colors.blueAccent,
       ),
 
@@ -160,7 +164,7 @@ class _ProductoPageState extends State<ProductoPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ProductosForm(idProducto: 0),
+                    builder: (context) => const TamalesForm(idTamal: 0),
                   ),
                 );
               },
