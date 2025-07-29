@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stockmx/formularios/compraPage.dart';
 import 'package:stockmx/formularios/productoPage.dart';
 import 'package:stockmx/formularios/proveedorPage.dart';
+import 'package:stockmx/formularios/tamalPage.dart';
 import 'formularios/insumos.dart';
 import 'drawer.dart';
 import 'formularios/produccion.dart';
@@ -40,6 +41,11 @@ class _HomePageState extends State<HomePage> {
         context,
         MaterialPageRoute(builder: (_) => const CompraPage()),
       );
+    } else if (menu == 'Tamales') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const TamalPage()),
+      );
     } else {
       // Las secciones que no tienen página propia se renderizan aquí
       setState(() {
@@ -76,58 +82,45 @@ class _HomePageState extends State<HomePage> {
 
   /// 🔹 Contenido solo para secciones internas
   Widget _getMainContent() {
-    switch (_selectedMenu) {
-      case 'Insumos':
-        return const InsumosForm();
-      case 'Compras':
-        return const CompraPage();
-      case 'Producción':
-        return const ProduccionForm();
-      case 'Inicio':
-      default:
-        return Padding(
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Card(
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Card(
-            elevation: 8,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: ListView(
-                children: [
-                  const SizedBox(height: 10),
-                  Center(
-                    child: Text(
-                      'Bienvenido a la Tamalería "El Buen Sabor"',
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent,
-                          ),
-                      textAlign: TextAlign.center,
-                    ),
+          child: ListView(
+            children: [
+              const SizedBox(height: 10),
+              Center(
+                child: Text(
+                  'Bienvenido a la Tamalería "El Buen Sabor"',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blueAccent,
                   ),
-                  const SizedBox(height: 20),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      'assets/images/tamales.jpg',
-                      height: 250,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Gestiona eficientemente insumos, proveedores, productos, compras y producción de tamales con esta aplicación desarrollada en Flutter.',
-                    style: TextStyle(fontSize: 16, color: Colors.black87),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+                  textAlign: TextAlign.center,
+                ),
               ),
-            ),
+              const SizedBox(height: 20),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  'assets/images/tamales.jpg',
+                  height: 250,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Gestiona eficientemente insumos, proveedores, productos, compras y producción de tamales con esta aplicación desarrollada en Flutter.',
+                style: TextStyle(fontSize: 16, color: Colors.black87),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
-        );
-    }
+        ),
+      ),
+    );
   }
 }

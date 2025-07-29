@@ -56,6 +56,7 @@ class MainDrawer extends StatelessWidget {
           _buildDrawerItem(Icons.people, 'Proveedores'),
           _buildDrawerItem(Icons.inventory, 'Productos'),
           _buildDrawerItem(Icons.shopping_cart, 'Compras'),
+          _buildDrawerItem(Icons.rice_bowl, 'Tamales'),
           _buildDrawerItem(Icons.factory, 'Producción'),
         ],
       ),
