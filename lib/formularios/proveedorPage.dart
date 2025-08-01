@@ -5,6 +5,7 @@ import 'package:stockmx/drawer.dart';
 import 'package:stockmx/formularios/compraPage.dart';
 import 'package:stockmx/formularios/model/proveedorModel.dart';
 import 'package:stockmx/formularios/model/url.dart';
+import 'package:stockmx/formularios/produccionPage.dart';
 import 'package:stockmx/formularios/productoPage.dart';
 import 'package:stockmx/formularios/proveedores.dart';
 import 'package:stockmx/formularios/tamalPage.dart';
@@ -37,7 +38,12 @@ class _ProveedorPageState extends State<ProveedorPage> {
         context,
         MaterialPageRoute(builder: (_) => const TamalPage()),
       );
-    } else if (menu == 'Proveedores') {
+    } else if (menu == 'Producción') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const ProduccionPage()),
+      );
+    }else if (menu == 'Proveedores') {
       return; // ya estamos aquí
     } else {
       Navigator.pushReplacement(

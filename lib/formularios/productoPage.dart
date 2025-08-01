@@ -5,6 +5,7 @@ import 'package:stockmx/drawer.dart';
 import 'package:stockmx/formularios/compraPage.dart';
 import 'package:stockmx/formularios/model/productoModel.dart';
 import 'package:stockmx/formularios/model/url.dart';
+import 'package:stockmx/formularios/produccionPage.dart';
 import 'package:stockmx/formularios/productos.dart';
 import 'package:stockmx/formularios/proveedorPage.dart';
 import 'package:stockmx/formularios/tamalPage.dart';
@@ -37,7 +38,12 @@ class _ProductoPageState extends State<ProductoPage> {
         context,
         MaterialPageRoute(builder: (_) => const TamalPage()),
       );
-    } else if (menu == 'Productos') {
+    } else if (menu == 'Producción') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const ProduccionPage()),
+      );
+    }else if (menu == 'Productos') {
       return; // ya estamos aquí
     } else {
       Navigator.pushReplacement(

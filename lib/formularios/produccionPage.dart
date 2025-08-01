@@ -2,34 +2,30 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:stockmx/drawer.dart';
-import 'package:stockmx/formularios/compras.dart';
-import 'package:stockmx/formularios/model/compraModel.dart';
-import 'package:stockmx/formularios/model/productoModel.dart';
-import 'package:stockmx/formularios/model/proveedorModel.dart';
+import 'package:stockmx/formularios/compraPage.dart';
+import 'package:stockmx/formularios/model/produccionModel.dart';
+import 'package:stockmx/formularios/model/tamalModel.dart';
 import 'package:stockmx/formularios/model/url.dart';
-import 'package:stockmx/formularios/produccionPage.dart';
+import 'package:stockmx/formularios/produccion.dart';
 import 'package:stockmx/formularios/productoPage.dart';
 import 'package:stockmx/formularios/proveedorPage.dart';
 import 'package:stockmx/formularios/tamalPage.dart';
 import 'package:stockmx/home.dart';
 
-class CompraPage extends StatefulWidget {
-  const CompraPage({super.key});
+class ProduccionPage extends StatefulWidget {
+  const ProduccionPage({super.key});
 
   @override
-  State<CompraPage> createState() => _CompraPageState();
+  State<ProduccionPage> createState() => _ProduccionPageState();
 }
 
-class _CompraPageState extends State<CompraPage> {
-  final String _selectedMenu = 'Compras';
+class _ProduccionPageState extends State<ProduccionPage> {
+  final String _selectedMenu = 'Producción';
 
-  List<ProveedorModel> proveedores = [];
-  String? selectedProveedorId;
+  List<TamalModel> tamales = [];
+  String? selectedTamalId;
 
-  List<ProductoModel> productos = [];
-  String? selectedProductoId;
-
-  List<CompraModel> compras = [];
+  List<ProduccionModel> producciones = [];
 
   /// 🔹 Navegación desde el Drawer
   void _onMenuSelected(String menu) {
@@ -48,12 +44,17 @@ class _CompraPageState extends State<CompraPage> {
         context,
         MaterialPageRoute(builder: (_) => const TamalPage()),
       );
-    } else if (menu == 'Producción') {
+    } else if (menu == 'Producto') {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const ProduccionPage()),
+        MaterialPageRoute(builder: (_) => const ProductoPage()),
       );
-    }else if (menu == 'Compras') {
+    } else if (menu == 'Compras') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const CompraPage()),
+      );
+    } else if (menu == 'Producción') {
       return;
     } else {
       Navigator.pushReplacement(
@@ -64,7 +65,7 @@ class _CompraPageState extends State<CompraPage> {
   }
 
   /// 🔹 Obtiene compras desde la API
-  void fnGetCompra() async {
+  void fnGetProduccion() async {
     http.Response response;
     if (Url.rol == 'Proveedor') {
       response = await http.post(
@@ -76,96 +77,58 @@ class _CompraPageState extends State<CompraPage> {
       );
     } else {
       response = await http.post(
-        Uri.parse('${Url.urlServer}/api/compras'),
+        Uri.parse('${Url.urlServer}/api/producciones'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
       );
     }
 
-    Iterable mapCompra = jsonDecode(response.body);
-    compras = List<CompraModel>.from(
-      mapCompra.map((model) => CompraModel.fromJson(model)),
+    Iterable mapProduccion = jsonDecode(response.body);
+    producciones = List<ProduccionModel>.from(
+      mapProduccion.map((model) => ProduccionModel.fromJson(model)),
     );
 
     setState(() {});
   }
 
-  /// 🔹 Obtiene proveedores desde la API
-  void fnGetProveedores() async {
+  /// 🔹 Obtiene tamales desde la API
+  void fnGetTamales() async {
     final response = await http.post(
-      Uri.parse('${Url.urlServer}/api/proveedores'),
+      Uri.parse('${Url.urlServer}/api/tamales'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
     );
 
-    Iterable mapProv = jsonDecode(response.body);
-    proveedores = List<ProveedorModel>.from(
-      mapProv.map((model) => ProveedorModel.fromJson(model)),
+    Iterable mapTamal = jsonDecode(response.body);
+    tamales = List<TamalModel>.from(
+      mapTamal.map((model) => TamalModel.fromJson(model)),
     );
     setState(() {});
   }
 
-  /// 🔹 Obtiene productos desde la API
-  void fnGetProductos() async {
-    final response = await http.post(
-      Uri.parse('${Url.urlServer}/api/productos'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
+  /// 🔹 Busca el nombre del tamal por ID
+  String getNombreTamal(int? idTamal) {
+    final tamal = tamales.firstWhere(
+      (t) => t.idT == idTamal,
+      orElse: () => TamalModel(idT: 0, nomT: 'Desconocido', descripcion: ''),
     );
-
-    Iterable mapProd = jsonDecode(response.body);
-    productos = List<ProductoModel>.from(
-      mapProd.map((model) => ProductoModel.fromJson(model)),
-    );
-    setState(() {});
+    return tamal.nomT;
   }
 
-  /// 🔹 Busca el nombre del proveedor por ID
-  String getNombreProveedor(int? idProv) {
-    final prov = proveedores.firstWhere(
-      (p) => p.idP == idProv,
-      orElse: () => ProveedorModel(
-        idP: 0,
-        nombre: 'Desconocido',
-        apellidoPaterno: '',
-        apellidoMaterno: '',
-        telefono: '',
-        email: '',
-      ),
-    );
-    return '${prov.nombre} ${prov.apellidoPaterno}';
-  }
-
-  /// 🔹 Busca el nombre del producto por ID
-  String getNombreProducto(int? idProd) {
-    final prod = productos.firstWhere(
-      (p) => p.idProd == idProd,
-      orElse: () => ProductoModel(
-        idProd: 0,
-        nombreProd: 'Desconocido',
-        descripcion: '',
-        precioU: 0.0,
-      ),
-    );
-    return prod.nombreProd;
-  }
-
-  /// 🔹 Construye la lista de compras
-  Widget _listViewCompras() {
-    if (compras.isEmpty) {
-      return const Center(child: Text('No hay compras disponibles'));
+  /// 🔹 Construye la lista de tamales
+  Widget _listViewTamales() {
+    if (tamales.isEmpty) {
+      return const Center(child: Text('No hay producciones disponibles'));
     }
 
     return ListView.builder(
       padding: const EdgeInsets.all(8),
-      itemCount: compras.length,
+      itemCount: producciones.length,
       itemBuilder: (context, index) {
-        final compra = compras[index];
-        final proveedorNombre = getNombreProveedor(compra.idProv);
-        final productoNombre = getNombreProducto(compra.idProd);
+        final produccion = producciones[index];
+        final tamalNombre = getNombreTamal(produccion.idTamal);
 
         return Card(
           margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
@@ -175,25 +138,29 @@ class _CompraPageState extends State<CompraPage> {
           elevation: 3,
           child: ListTile(
             onTap: () {
-              if (Url.rol != 'Administrador' || Url.id == compra.idCompra) {
+              if (Url.rol != 'Administrador' ||
+                  Url.id == produccion.idProduccion) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ComprasForm(idCompra: compra.idCompra),
+                    builder: (context) =>
+                        ProduccionForm(idProduccion: produccion.idProduccion),
                   ),
                 );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('No tienes permiso para editar esta compra.'),
+                    content: Text(
+                      'No tienes permiso para editar esta produccion.',
+                    ),
                   ),
                 );
               }
             },
-            title: Text('$productoNombre - $proveedorNombre'),
+            title: Text('Tamal: ${tamalNombre}'),
             subtitle: Text(
-              'Cantidad: ${compra.cantidad} ${compra.unidad}\n'
-              'Total: \$${compra.total.toStringAsFixed(2)}',
+              'Fecha: ${produccion.fecha}\n'
+              'Cantidad Total: ${produccion.cantidadTotal}',
             ),
           ),
         );
@@ -204,9 +171,8 @@ class _CompraPageState extends State<CompraPage> {
   @override
   void initState() {
     super.initState();
-    fnGetCompra();
-    fnGetProveedores();
-    fnGetProductos();
+    fnGetProduccion();
+    fnGetTamales();
   }
 
   @override
@@ -217,7 +183,7 @@ class _CompraPageState extends State<CompraPage> {
         onItemSelected: _onMenuSelected,
       ),
       appBar: AppBar(
-        title: const Text('Compras'),
+        title: const Text('Produccion'),
         backgroundColor: Colors.blueAccent,
       ),
       body: Container(
@@ -230,7 +196,7 @@ class _CompraPageState extends State<CompraPage> {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: _listViewCompras(),
+        child: _listViewTamales(),
       ),
       floatingActionButton: (Url.rol != 'Proveedor' && Url.rol != 'Cliente')
           ? FloatingActionButton(
@@ -239,7 +205,7 @@ class _CompraPageState extends State<CompraPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ComprasForm(idCompra: 0),
+                    builder: (context) => const ProduccionForm(idProduccion: 0),
                   ),
                 );
               },

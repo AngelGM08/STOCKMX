@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:stockmx/drawer.dart';
 import 'package:stockmx/formularios/compraPage.dart';
-import 'package:stockmx/formularios/model/productoModel.dart';
 import 'package:stockmx/formularios/model/tamalModel.dart';
 import 'package:stockmx/formularios/model/url.dart';
+import 'package:stockmx/formularios/produccionPage.dart';
 import 'package:stockmx/formularios/productoPage.dart';
-import 'package:stockmx/formularios/productos.dart';
 import 'package:stockmx/formularios/proveedorPage.dart';
 import 'package:stockmx/formularios/tamales.dart';
 import 'package:stockmx/home.dart';
@@ -38,6 +37,11 @@ class _TamalPageState extends State<TamalPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const ProductoPage()),
+      );
+    }else if (menu == 'Producción') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const ProduccionPage()),
       );
     } else if (menu == 'Tamales') {
       return;
