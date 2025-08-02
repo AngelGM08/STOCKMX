@@ -21,7 +21,6 @@ class ProveedorPage extends StatefulWidget {
 class _ProveedorPageState extends State<ProveedorPage> {
   final String _selectedMenu = 'Proveedores';
 
-  /// 🔹 Manejo de selección del menú del Drawer
   void _onMenuSelected(String menu) {
     if (menu == 'Productos') {
       Navigator.pushReplacement(
@@ -43,8 +42,8 @@ class _ProveedorPageState extends State<ProveedorPage> {
         context,
         MaterialPageRoute(builder: (_) => const ProduccionPage()),
       );
-    }else if (menu == 'Proveedores') {
-      return; // ya estamos aquí
+    } else if (menu == 'Proveedores') {
+      return;
     } else {
       Navigator.pushReplacement(
         context,
@@ -55,13 +54,12 @@ class _ProveedorPageState extends State<ProveedorPage> {
 
   List<ProveedorModel> proveedores = [];
 
-  /// 🔹 Obtiene la lista de proveedores desde la API
   void fnGetProveedores() async {
     http.Response response;
     if (Url.rol == 'Proveedor') {
       response = await http.post(
         Uri.parse('${Url.urlServer}/api/usuario/roles'),
-        body: jsonEncode(<String, dynamic>{'rol': 'Cliente'}),
+        body: jsonEncode({'rol': 'Cliente'}),
         headers: {'Content-Type': 'application/json; charset=UTF-8'},
       );
     } else {
@@ -79,24 +77,33 @@ class _ProveedorPageState extends State<ProveedorPage> {
     setState(() {});
   }
 
-  /// 🔹 Construye la lista de proveedores
   Widget _listViewProveedor() {
     if (proveedores.isEmpty) {
-      return const Center(child: Text('No hay proveedores disponibles'));
+      return const Center(
+        child: Text(
+          'No hay proveedores disponibles',
+          style: TextStyle(fontSize: 16, color: Colors.black54),
+        ),
+      );
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(12),
       itemCount: proveedores.length,
       itemBuilder: (context, index) {
         final proveedor = proveedores[index];
         return Card(
-          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+          margin: const EdgeInsets.symmetric(vertical: 6),
+          color: const Color(0xFFE3F2FD),
+          elevation: 3,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          elevation: 3,
           child: ListTile(
+            leading: const Icon(Icons.person, color: Color(0xFF448AFF)),
+            title: Text(proveedor.nombre,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text('Email: ${proveedor.email}'),
             onTap: () {
               if (Url.rol != 'Administrador' || Url.id == proveedor.idP) {
                 Navigator.push(
@@ -109,15 +116,11 @@ class _ProveedorPageState extends State<ProveedorPage> {
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text(
-                      'No tienes permiso para editar esta persona.',
-                    ),
+                    content: Text('No tienes permiso para editar esta persona.'),
                   ),
                 );
               }
             },
-            title: Text(proveedor.nombre),
-            subtitle: Text('Email: ${proveedor.email}'),
           ),
         );
       },
@@ -133,36 +136,36 @@ class _ProveedorPageState extends State<ProveedorPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /// ✅ Usa el Drawer compartido
       drawer: MainDrawer(
         selectedMenu: _selectedMenu,
         onItemSelected: _onMenuSelected,
       ),
-
-      /// ✅ Se eliminó el AppBar duplicado (usamos solo el del Drawer)
       appBar: AppBar(
-        title: const Text('Proveedores'),
-        backgroundColor: Colors.blueAccent,
+        title: const Text(
+          'Proveedores',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF448AFF), // Azul seleccionado
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-
-      /// ✅ Fondo con gradiente
       body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFE3F2FD), Color(0xFFFFFFFF)],
+            colors: [
+              Color(0xFFE3F2FD), // Azul claro arriba
+              Color(0xFFFFFFFF), // Blanco abajo
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
         ),
         child: _listViewProveedor(),
       ),
-
-      /// ✅ Botón flotante solo si tiene permisos
       floatingActionButton: (Url.rol != 'Proveedor' && Url.rol != 'Cliente')
           ? FloatingActionButton(
-              backgroundColor: Colors.red.shade100,
+              backgroundColor: const Color(0xFF448AFF), // Botón azul
               onPressed: () {
                 Navigator.push(
                   context,
@@ -171,9 +174,10 @@ class _ProveedorPageState extends State<ProveedorPage> {
                   ),
                 );
               },
-              child: const Icon(Icons.add, color: Colors.black87),
+              child: const Icon(Icons.add, color: Colors.white),
             )
           : null,
     );
   }
 }
+

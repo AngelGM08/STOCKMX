@@ -20,48 +20,30 @@ class ProductoPage extends StatefulWidget {
 
 class _ProductoPageState extends State<ProductoPage> {
   final String _selectedMenu = 'Productos';
+  List<ProductoModel> productos = [];
 
-  /// 🔹 Manejo de navegación desde el Drawer
   void _onMenuSelected(String menu) {
     if (menu == 'Proveedores') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const ProveedorPage()),
-      );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const ProveedorPage()));
     } else if (menu == 'Compras') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const CompraPage()),
-      );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const CompraPage()));
     } else if (menu == 'Tamales') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const TamalPage()),
-      );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const TamalPage()));
     } else if (menu == 'Producción') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const ProduccionPage()),
-      );
-    }else if (menu == 'Productos') {
-      return; // ya estamos aquí
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const ProduccionPage()));
+    } else if (menu == 'Productos') {
+      return;
     } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => HomePage(initialMenu: menu)),
-      );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomePage(initialMenu: menu)));
     }
   }
 
-  List<ProductoModel> productos = [];
-
-  /// 🔹 Obtiene productos desde la API
   void fnGetProducto() async {
     http.Response response;
     if (Url.rol == 'Proveedor') {
       response = await http.post(
         Uri.parse('${Url.urlServer}/api/usuario/roles'),
-        body: jsonEncode(<String, dynamic>{'rol': 'Cliente'}),
+        body: jsonEncode({'rol': 'Cliente'}),
         headers: {'Content-Type': 'application/json; charset=UTF-8'},
       );
     } else {
@@ -79,44 +61,52 @@ class _ProductoPageState extends State<ProductoPage> {
     setState(() {});
   }
 
-  /// 🔹 Construye la lista de productos
   Widget _listViewProducto() {
     if (productos.isEmpty) {
-      return const Center(child: Text('No hay productos disponibles'));
+      return const Center(
+        child: Text('No hay productos disponibles',
+            style: TextStyle(fontSize: 16, color: Colors.black54)),
+      );
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(12),
       itemCount: productos.length,
       itemBuilder: (context, index) {
         final producto = productos[index];
         return Card(
-          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+          color: const Color(0xFFE3F2FD),
+          margin: const EdgeInsets.symmetric(vertical: 6),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          elevation: 3,
+          elevation: 4,
           child: ListTile(
+            leading: const Icon(Icons.category, color: Color(0xFF448AFF)),
+            title: Text(
+              producto.nombreProd,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(
+              'Descripción: ${producto.descripcion}\n'
+              'Precio: \$${producto.precioU.toStringAsFixed(2)}',
+            ),
             onTap: () {
               if (Url.rol != 'Administrador' || Url.id == producto.idProd) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProductosForm(idProducto: producto.idProd),
+                    builder: (_) => ProductosForm(idProducto: producto.idProd),
                   ),
                 );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text(
-                      'No tienes permiso para editar este producto.',
-                    ),
+                    content: Text('No tienes permiso para editar este producto.'),
                   ),
                 );
               }
             },
-            title: Text(producto.nombreProd),
-            subtitle: Text('Descripción: ${producto.descripcion}\n''Precio: \$${producto.precioU.toStringAsFixed(2)}'),
           ),
         );
       },
@@ -132,19 +122,18 @@ class _ProductoPageState extends State<ProductoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /// ✅ Drawer compartido
       drawer: MainDrawer(
         selectedMenu: _selectedMenu,
         onItemSelected: _onMenuSelected,
       ),
-
-      /// ✅ AppBar consistente
       appBar: AppBar(
-        title: const Text('Productos'),
-        backgroundColor: Colors.blueAccent,
+        title: const Text(
+          'Productos',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF448AFF),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-
-      /// ✅ Fondo con gradiente
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -157,22 +146,20 @@ class _ProductoPageState extends State<ProductoPage> {
         ),
         child: _listViewProducto(),
       ),
-
-      /// ✅ Botón flotante solo para roles permitidos
       floatingActionButton: (Url.rol != 'Proveedor' && Url.rol != 'Cliente')
           ? FloatingActionButton(
-              backgroundColor: Colors.red.shade100,
+              backgroundColor: const Color(0xFF448AFF),
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProductosForm(idProducto: 0),
-                  ),
+                  MaterialPageRoute(builder: (_) => const ProductosForm(idProducto: 0)),
                 );
               },
-              child: const Icon(Icons.add, color: Colors.black87),
+              child: const Icon(Icons.add, color: Colors.white),
             )
           : null,
     );
   }
 }
+
+
