@@ -1,18 +1,33 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
-  runApp(TamaleriaApp());
+  runApp(const MyApp());
 }
 
-class TamaleriaApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tamalería',
-      theme: ThemeData(primarySwatch: Colors.green),
-      home: HomeScreen(),
       debugShowCheckedModeBanner: false,
+      title: 'Tamalería App',
+      locale: const Locale('es', 'MX'), // Idioma español México
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('es', 'MX'),
+        Locale('en', 'US'),
+      ],
+      theme: ThemeData(
+        useMaterial3: true,
+      ),
+      home: const HomeScreen(),
     );
   }
 }
