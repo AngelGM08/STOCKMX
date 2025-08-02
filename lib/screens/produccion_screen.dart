@@ -93,7 +93,8 @@ Future<void> fetchTamales() async {
       }),
     );
 
-    if (response.statusCode == 200 && response.body == 'ok') {
+    final data = jsonDecode(response.body);
+if (response.statusCode == 200 && data['status'] == 'ok') {
       setState(() {
         _producciones = fetchProducciones();
       });
@@ -123,7 +124,8 @@ Future<void> fetchTamales() async {
         body: jsonEncode({'id': id}),
       );
 
-      if (response.statusCode == 200 && response.body == 'ok') {
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 && data['status'] == 'ok') {
         setState(() {
           _producciones = fetchProducciones();
         });
