@@ -40,8 +40,10 @@ class _ProduccionFormState extends State<ProduccionForm> {
         final produccion = ProduccionModel.fromJson(responseJson);
 
         setState(() {
+          selectedTamalId = produccion.idTamal.toString();
           txtFecha.text = formatoFecha.format(produccion.fecha);
           txtCantidadT.text = produccion.cantidadTotal.toString();
+          
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -76,20 +78,19 @@ class _ProduccionFormState extends State<ProduccionForm> {
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al cargar los tamal')),
+          const SnackBar(content: Text('Error al cargar los tamales')),
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')));
     } finally {
       setState(() => isLoading = false);
     }
   }
 
   Future<void> enviarProduccion() async {
-    if (txtFecha.text.isEmpty || txtCantidadT.text.isEmpty) {
+    if (txtFecha.text.isEmpty || txtCantidadT.text.isEmpty || selectedTamalId == null)  {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor, llena todos los campos')),
       );
@@ -112,7 +113,9 @@ class _ProduccionFormState extends State<ProduccionForm> {
         },
       );
 
-      if (response.body == "ok") {
+      final data = jsonDecode(response.body);
+      
+      if (data['status'] == 'ok') {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const ProduccionPage()),
@@ -142,7 +145,9 @@ class _ProduccionFormState extends State<ProduccionForm> {
         },
       );
 
-      if (response.body == "ok") {
+      final data = jsonDecode(response.body);
+      
+      if (data['status'] == 'ok') {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const ProduccionPage()),
@@ -178,13 +183,17 @@ class _ProduccionFormState extends State<ProduccionForm> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    cargarTamal();
-    if (widget.idProduccion != 0) {
-      cargarProduccion();
-    }
+void initState() {
+  super.initState();
+  cargarTodo();
+}
+
+Future<void> cargarTodo() async {
+  await cargarTamal(); // Esperar a que termine de cargar tamales
+  if (widget.idProduccion != 0) {
+    await cargarProduccion(); // Ahora sí, cargar la producción
   }
+}
 
   @override
   Widget build(BuildContext context) {

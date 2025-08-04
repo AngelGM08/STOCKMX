@@ -57,6 +57,8 @@ class _ProductoPageState extends State<ProductoPage> {
     productos = List<ProductoModel>.from(
       mapProducto.map((model) => ProductoModel.fromJson(model)),
     );
+    
+    print('Productos cargados: ${productos.length}');
 
     setState(() {});
   }

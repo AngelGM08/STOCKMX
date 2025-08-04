@@ -77,7 +77,9 @@ class _ProveedoresFormState extends State<ProductosForm> {
         },
       );
 
-      if (response.body == "ok") {
+      final data = jsonDecode(response.body);
+      
+      if (data['status'] == 'ok') {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const ProductoPage()),
@@ -107,7 +109,9 @@ class _ProveedoresFormState extends State<ProductosForm> {
         },
       );
 
-      if (response.body == "ok") {
+      final data = jsonDecode(response.body);
+      
+      if (data['status'] == 'ok') {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => ProductoPage()),

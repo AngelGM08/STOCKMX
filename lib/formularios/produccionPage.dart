@@ -76,7 +76,7 @@ class _ProduccionPageState extends State<ProduccionPage> {
         },
       );
     } else {
-      response = await http.post(
+      response = await http.get(
         Uri.parse('${Url.urlServer}/api/producciones'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
