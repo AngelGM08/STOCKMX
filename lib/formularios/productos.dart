@@ -130,6 +130,8 @@ class _ProveedoresFormState extends State<ProductosForm> {
     }
   }
 
+  
+
   @override
   void initState() {
     super.initState();
@@ -139,25 +141,80 @@ class _ProveedoresFormState extends State<ProductosForm> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Productos')),
-      body: ListView(
-        children: [
-          const Text('Nombre Producto: '),
-          TextFormField(controller: txtNombreProd),
-          const Text('Descripción: '),
-          TextFormField(controller: txtDescripcion),
-          const Text('Precio Unitario: '),
-          TextFormField(controller: txtPrecio),
-          TextButton(onPressed: enviarProducto, child: const Text('Guardar')),
-          if (widget.idProducto != 0)
-            ElevatedButton(
-              onPressed: eliminarProducto,
-              child: const Text('Eliminar'),
-            ),
-        ],
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('🫔 Producto'),
+      backgroundColor: const Color(0xFF6D4C41),
+      foregroundColor: Colors.white,
+    ),
+    backgroundColor: const Color(0xFFF5F5F5),
+    body: Center(
+      child: Card(
+        margin: const EdgeInsets.all(16),
+        color: const Color(0xFFFFF8E7),
+        elevation: 6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.local_dining, size: 50, color: Color(0xFF6D4C41)),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: txtNombreProd,
+                decoration: const InputDecoration(
+                  labelText: 'Nombre del producto',
+                  prefixIcon: Icon(Icons.fastfood),
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: txtDescripcion,
+                decoration: const InputDecoration(
+                  labelText: 'Descripción',
+                  prefixIcon: Icon(Icons.description),
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: txtPrecio,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                  labelText: 'Precio unitario',
+                  prefixIcon: Icon(Icons.attach_money),
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF8D6E63),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+                onPressed: enviarProducto,
+                icon: const Icon(Icons.save),
+                label: const Text('Guardar'),
+              ),
+              if (widget.idProducto != 0) ...[
+                const SizedBox(height: 12),
+                TextButton.icon(
+                  onPressed: eliminarProducto,
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  label: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+                ),
+              ],
+            ],
+          ),
+        ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 }

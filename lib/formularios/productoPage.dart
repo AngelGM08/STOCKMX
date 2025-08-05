@@ -10,6 +10,9 @@ import 'package:stockmx/formularios/productos.dart';
 import 'package:stockmx/formularios/proveedorPage.dart';
 import 'package:stockmx/formularios/tamalPage.dart';
 import 'package:stockmx/home.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:flutter/material.dart';
+
 
 class ProductoPage extends StatefulWidget {
   const ProductoPage({super.key});
@@ -24,19 +27,60 @@ class _ProductoPageState extends State<ProductoPage> {
 
   void _onMenuSelected(String menu) {
     if (menu == 'Proveedores') {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const ProveedorPage()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const ProveedorPage()),
+      );
     } else if (menu == 'Compras') {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const CompraPage()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const CompraPage()),
+      );
     } else if (menu == 'Tamales') {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const TamalPage()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const TamalPage()),
+      );
     } else if (menu == 'Producción') {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const ProduccionPage()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const ProduccionPage()),
+      );
     } else if (menu == 'Productos') {
       return;
     } else {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomePage(initialMenu: menu)));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => HomePage(initialMenu: menu)),
+      );
     }
   }
+
+  
+void mostrarSnackbarCentrado(BuildContext context, String mensaje) {
+  final overlay = Overlay.of(context);
+  final overlayEntry = OverlayEntry(
+    builder: (context) => Positioned(
+      top: MediaQuery.of(context).size.height * 0.4,
+      left: 20,
+      right: 20,
+      child: Material(
+        elevation: 10,
+        borderRadius: BorderRadius.circular(16),
+        child: AwesomeSnackbarContent(
+          title: 'No se puede eliminar',
+          message: mensaje,
+          contentType: ContentType.failure,
+          inMaterialBanner: true,
+        ),
+      ),
+    ),
+  );
+
+  overlay.insert(overlayEntry);
+  Future.delayed(const Duration(seconds: 3), () => overlayEntry.remove());
+}
+
 
   void fnGetProducto() async {
     http.Response response;
@@ -57,7 +101,7 @@ class _ProductoPageState extends State<ProductoPage> {
     productos = List<ProductoModel>.from(
       mapProducto.map((model) => ProductoModel.fromJson(model)),
     );
-    
+
     print('Productos cargados: ${productos.length}');
 
     setState(() {});
@@ -66,53 +110,191 @@ class _ProductoPageState extends State<ProductoPage> {
   Widget _listViewProducto() {
     if (productos.isEmpty) {
       return const Center(
-        child: Text('No hay productos disponibles',
-            style: TextStyle(fontSize: 16, color: Colors.black54)),
+        child: Text(
+          'No hay productos disponibles',
+          style: TextStyle(fontSize: 16, color: Colors.black54),
+        ),
       );
     }
 
-    return ListView.builder(
+    return GridView.builder(
       padding: const EdgeInsets.all(12),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 0.75,
+      ),
       itemCount: productos.length,
       itemBuilder: (context, index) {
         final producto = productos[index];
         return Card(
-          color: const Color(0xFFE3F2FD),
-          margin: const EdgeInsets.symmetric(vertical: 6),
+          elevation: 6,
+          color: const Color(0xFFFFF8E7),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
-          elevation: 4,
-          child: ListTile(
-            leading: const Icon(Icons.category, color: Color(0xFF448AFF)),
-            title: Text(
-              producto.nombreProd,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(
-              'Descripción: ${producto.descripcion}\n'
-              'Precio: \$${producto.precioU.toStringAsFixed(2)}',
-            ),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
             onTap: () {
-              if (Url.rol != 'Administrador' || Url.id == producto.idProd) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ProductosForm(idProducto: producto.idProd),
-                  ),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('No tienes permiso para editar este producto.'),
-                  ),
-                );
-              }
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ProductosForm(idProducto: producto.idProd),
+                ),
+              );
             },
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.rice_bowl,
+                    size: 40,
+                    color: Color(0xFF6D4C41),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    producto.nombreProd,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    producto.descripcion,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 13),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    '\$${producto.precioU.toStringAsFixed(2)}',
+                    style: const TextStyle(fontSize: 16, color: Colors.black87),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Color(0xFF6D4C41)),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  ProductosForm(idProducto: producto.idProd),
+                            ),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.redAccent),
+                        onPressed: () {
+                          eliminarProductoDesdeCatalogo(producto.idProd);
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
         );
       },
     );
+  }
+
+  Future<void> eliminarProductoDesdeCatalogo(int idProducto) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Eliminar producto?'),
+        content: const Text('Esta acción no se puede deshacer.'),
+        actions: [
+          TextButton(
+            child: const Text('Cancelar'),
+            onPressed: () => Navigator.pop(context, false),
+          ),
+          ElevatedButton(
+            child: const Text('Eliminar'),
+            onPressed: () => Navigator.pop(context, true),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      final url = Uri.parse('${Url.urlServer}/api/producto/eliminar');
+      print('👉 POST a: $url con id: $idProducto');
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({'id': idProducto}),
+      );
+
+      print('🔁 STATUS: ${response.statusCode}');
+      print('🔁 BODY: ${response.body}');
+
+      if (response.statusCode == 200 &&
+          response.headers['content-type']?.contains('application/json') ==
+              true) {
+        final data = jsonDecode(response.body);
+
+        if (data['status'] == 'ok') {
+          setState(() => productos.removeWhere((p) => p.idProd == idProducto));
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Producto eliminado correctamente')),
+          );
+        } else if (data['status'] == 'foreign_key_violation') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'No se puede eliminar: el producto está vinculado a compras.',
+              ),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error inesperado: ${data['message']}')),
+          );
+        }
+      } else {
+        final data = jsonDecode(response.body);
+
+        if (data['status'] == 'ok') {
+          setState(() => productos.removeWhere((p) => p.idProd == idProducto));
+          mostrarSnackbarCentrado(context, 'Producto eliminado correctamente');
+        } else if (data['status'] == 'foreign_key_violation') {
+          mostrarSnackbarCentrado(
+            context,
+            'Este producto está vinculado a compras y no puede eliminarse.',
+          );
+        } else {
+          mostrarSnackbarCentrado(
+            context,
+            'Error al eliminar: ${data['message'] ?? 'desconocido'}',
+          );
+        }
+      }
+    } catch (e) {
+      print('🛑 Error al eliminar: $e');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+    }
   }
 
   @override
@@ -129,19 +311,17 @@ class _ProductoPageState extends State<ProductoPage> {
         onItemSelected: _onMenuSelected,
       ),
       appBar: AppBar(
+        backgroundColor: const Color(0xFF6D4C41),
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
-          'Productos',
+          '🫔 Catálogo de Productos',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF448AFF),
-        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFE3F2FD), Color(0xFFFFFFFF)],
+            colors: [Color(0xFFFFF8E7), Color(0xFFFFFFFF)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -149,19 +329,20 @@ class _ProductoPageState extends State<ProductoPage> {
         child: _listViewProducto(),
       ),
       floatingActionButton: (Url.rol != 'Proveedor' && Url.rol != 'Cliente')
-          ? FloatingActionButton(
-              backgroundColor: const Color(0xFF448AFF),
+          ? FloatingActionButton.extended(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const ProductosForm(idProducto: 0)),
+                  MaterialPageRoute(
+                    builder: (_) => const ProductosForm(idProducto: 0),
+                  ),
                 );
               },
-              child: const Icon(Icons.add, color: Colors.white),
+              label: const Text('Agregar'),
+              icon: const Icon(Icons.add),
+              backgroundColor: const Color(0xFF8D6E63),
             )
           : null,
     );
   }
 }
-
-
