@@ -3,9 +3,10 @@ import 'package:stockmx/formularios/compraPage.dart';
 import 'package:stockmx/formularios/productoPage.dart';
 import 'package:stockmx/formularios/proveedorPage.dart';
 import 'package:stockmx/formularios/tamalPage.dart';
-import 'package:stockmx/formularios/insumos.dart';
 import 'package:stockmx/formularios/produccion.dart';
 import 'package:stockmx/formularios/produccionPage.dart';
+import 'package:stockmx/formularios/insumoPage.dart';
+
 import 'drawer.dart';
 
 class HomePage extends StatefulWidget {
@@ -26,37 +27,43 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onMenuSelected(String menu) {
-    if (menu == 'Proveedores') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const ProveedorPage()),
-      );
-    } else if (menu == 'Productos') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const ProductoPage()),
-      );
-    } else if (menu == 'Compras') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const CompraPage()),
-      );
-    } else if (menu == 'Tamales') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const TamalPage()),
-      );
-    } else if (menu == 'Producción') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const ProduccionPage()),
-      );
-    } else {
-      setState(() {
-        _selectedMenu = menu;
-      });
-    }
+  if (menu == 'Insumos') {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const InsumoPage()),
+    );
+  } else if (menu == 'Proveedores') {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ProveedorPage()),
+    );
+  } else if (menu == 'Productos') {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ProductoPage()),
+    );
+  } else if (menu == 'Compras') {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const CompraPage()),
+    );
+  } else if (menu == 'Tamales') {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const TamalPage()),
+    );
+  } else if (menu == 'Producción') {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ProduccionPage()),
+    );
+  } else {
+    setState(() {
+      _selectedMenu = menu;
+    });
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
