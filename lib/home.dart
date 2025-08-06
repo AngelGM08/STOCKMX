@@ -27,43 +27,42 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onMenuSelected(String menu) {
-  if (menu == 'Insumos') {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const InsumoPage()),
-    );
-  } else if (menu == 'Proveedores') {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const ProveedorPage()),
-    );
-  } else if (menu == 'Productos') {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const ProductoPage()),
-    );
-  } else if (menu == 'Compras') {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const CompraPage()),
-    );
-  } else if (menu == 'Tamales') {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const TamalPage()),
-    );
-  } else if (menu == 'Producción') {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const ProduccionPage()),
-    );
-  } else {
-    setState(() {
-      _selectedMenu = menu;
-    });
+    if (menu == 'Insumos') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const InsumoPage()),
+      );
+    } else if (menu == 'Proveedores') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const ProveedorPage()),
+      );
+    } else if (menu == 'Productos') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const ProductoPage()),
+      );
+    } else if (menu == 'Compras') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const CompraPage()),
+      );
+    } else if (menu == 'Tamales') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const TamalPage()),
+      );
+    } else if (menu == 'Producción') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const ProduccionPage()),
+      );
+    } else {
+      setState(() {
+        _selectedMenu = menu;
+      });
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -110,9 +109,14 @@ class _HomePageState extends State<HomePage> {
               onTap: () => _onMenuSelected('Proveedores'),
             ),
             _buildMenuItem(
-              icon: '🥡',
+              icon: '🫔🫔',
               label: 'Tamales',
               onTap: () => _onMenuSelected('Tamales'),
+            ),
+            _buildMenuItem(
+              icon: '🧂',
+              label: 'Insumos',
+              onTap: () => _onMenuSelected('Insumos'),
             ),
             _buildMenuItem(
               icon: '👤',

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:stockmx/drawer.dart';
@@ -64,6 +65,30 @@ class _ProduccionPageState extends State<ProduccionPage> {
     }
   }
 
+void mostrarSnackbarCentrado(BuildContext context, String mensaje) {
+  final overlay = Overlay.of(context);
+  final overlayEntry = OverlayEntry(
+    builder: (context) => Positioned(
+      top: MediaQuery.of(context).size.height * 0.4,
+      left: 20,
+      right: 20,
+      child: Material(
+        elevation: 10,
+        borderRadius: BorderRadius.circular(16),
+        child: AwesomeSnackbarContent(
+          title: 'Aviso',
+          message: mensaje,
+          contentType: ContentType.failure,
+          inMaterialBanner: true,
+        ),
+      ),
+    ),
+  );
+
+  overlay.insert(overlayEntry);
+  Future.delayed(const Duration(seconds: 3), () => overlayEntry.remove());
+}
+
   /// 🔹 Obtiene compras desde la API
   void fnGetProduccion() async {
     http.Response response;
@@ -117,56 +142,146 @@ class _ProduccionPageState extends State<ProduccionPage> {
     return tamal.nomT;
   }
 
-  /// 🔹 Construye la lista de tamales
-  Widget _listViewTamales() {
-    if (tamales.isEmpty) {
-      return const Center(child: Text('No hay producciones disponibles'));
-    }
+  Future<void> eliminarProduccionDesdeCatalogo(int idProduccion) async {
+  final confirm = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('¿Eliminar producción?'),
+      content: const Text('Esta acción no se puede deshacer.'),
+      actions: [
+        TextButton(
+          child: const Text('Cancelar'),
+          onPressed: () => Navigator.pop(context, false),
+        ),
+        ElevatedButton(
+          child: const Text('Eliminar'),
+          onPressed: () => Navigator.pop(context, true),
+        ),
+      ],
+    ),
+  );
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(8),
-      itemCount: producciones.length,
-      itemBuilder: (context, index) {
-        final produccion = producciones[index];
-        final tamalNombre = getNombreTamal(produccion.idTamal);
+  if (confirm != true) return;
 
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 3,
-          child: ListTile(
-            onTap: () {
-              if (Url.rol != 'Administrador' ||
-                  Url.id == produccion.idProduccion) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ProduccionForm(idProduccion: produccion.idProduccion),
-                  ),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'No tienes permiso para editar esta produccion.',
-                    ),
-                  ),
-                );
-              }
-            },
-            title: Text('Tamal: ${tamalNombre}'),
-            subtitle: Text(
-              'Fecha: ${produccion.fecha}\n'
-              'Cantidad Total: ${produccion.cantidadTotal}',
-            ),
-          ),
-        );
+  try {
+    final url = Uri.parse('${Url.urlServer}/api/produccion/eliminar');
+    final response = await http.post(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=UTF-8',
       },
+      body: jsonEncode({'id': idProduccion}),
+    );
+
+    final data = jsonDecode(response.body);
+
+    if (data['status'] == 'ok') {
+      setState(() => producciones.removeWhere((p) => p.idProduccion == idProduccion));
+      mostrarSnackbarCentrado(context, 'Producción eliminada correctamente');
+    } else if (data['status'] == 'foreign_key_violation') {
+      mostrarSnackbarCentrado(context, 'Esta producción está vinculada y no puede eliminarse.');
+    } else {
+      mostrarSnackbarCentrado(context, 'Error al eliminar: ${data['message'] ?? 'desconocido'}');
+    }
+  } catch (e) {
+    mostrarSnackbarCentrado(context, 'Error al eliminar: ${e.toString()}');
+  }
+}
+
+
+  /// 🔹 Construye la vista de producciones en formato de tarjetas
+Widget _listViewTamales() {
+  if (producciones.isEmpty) {
+    return const Center(
+      child: Text(
+        'No hay producciones disponibles',
+        style: TextStyle(fontSize: 16, color: Colors.black54),
+      ),
     );
   }
+
+  return GridView.builder(
+    padding: const EdgeInsets.all(12),
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 2,
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
+      childAspectRatio: 0.8,
+    ),
+    itemCount: producciones.length,
+    itemBuilder: (context, index) {
+      final produccion = producciones[index];
+      final tamalNombre = getNombreTamal(produccion.idTamal);
+
+      return Card(
+        elevation: 6,
+        color: const Color(0xFFFFF8E7),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            children: [
+              const Icon(
+                Icons.factory, // Icono representativo de producción
+                size: 40,
+                color: Color(0xFF6D4C41),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                tamalNombre,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Fecha: ${produccion.fecha}',
+                style: const TextStyle(fontSize: 13),
+              ),
+              Text(
+                'Cantidad: ${produccion.cantidadTotal}',
+                style: const TextStyle(fontSize: 13),
+              ),
+              const SizedBox(height: 6),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Color(0xFF6D4C41)),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ProduccionForm(
+                            idProduccion: produccion.idProduccion,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.redAccent),
+                    onPressed: () {
+                      eliminarProduccionDesdeCatalogo(produccion.idProduccion);
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
 
   @override
   void initState() {
@@ -176,42 +291,45 @@ class _ProduccionPageState extends State<ProduccionPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: MainDrawer(
-        selectedMenu: _selectedMenu,
-        onItemSelected: _onMenuSelected,
+Widget build(BuildContext context) {
+  return Scaffold(
+    drawer: MainDrawer(
+      selectedMenu: _selectedMenu,
+      onItemSelected: _onMenuSelected,
+    ),
+    appBar: AppBar(
+      backgroundColor: const Color(0xFF6D4C41), // Mismo tono café usado en ProductoPage
+      iconTheme: const IconThemeData(color: Colors.white),
+      title: const Text(
+        '🛠 Producción',
+        style: TextStyle(color: Colors.white),
       ),
-      appBar: AppBar(
-        title: const Text('Produccion'),
-        backgroundColor: Colors.blueAccent,
-      ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFE3F2FD), Color(0xFFFFFFFF)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
+    ),
+    body: Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFFFFF8E7), Color(0xFFFFFFFF)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
-        child: _listViewTamales(),
       ),
-      floatingActionButton: (Url.rol != 'Proveedor' && Url.rol != 'Cliente')
-          ? FloatingActionButton(
-              backgroundColor: Colors.red.shade100,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProduccionForm(idProduccion: 0),
-                  ),
-                );
-              },
-              child: const Icon(Icons.add, color: Colors.black87),
-            )
-          : null,
-    );
-  }
+      child: _listViewTamales(),
+    ),
+    floatingActionButton: (Url.rol != 'Proveedor' && Url.rol != 'Cliente')
+        ? FloatingActionButton.extended(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const ProduccionForm(idProduccion: 0),
+                ),
+              );
+            },
+            label: const Text('Agregar'),
+            icon: const Icon(Icons.add),
+            backgroundColor: const Color(0xFF8D6E63), // Café más oscuro
+          )
+        : null,
+  );
+}
 }
