@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'model/url.dart';
-import 'model/proveedorModel.dart';
+import 'package:stockmx/formularios/model/proveedorModel.dart';
 import 'package:stockmx/formularios/proveedorPage.dart';
 import 'package:http/http.dart' as http;
+import 'model/url.dart';
 
 class ProveedoresForm extends StatefulWidget {
   final int idProveedor;
@@ -43,15 +43,20 @@ class _ProveedoresFormState extends State<ProveedoresForm> {
     }
   }
 
-  InputDecoration _inputDecoration(String label) {
+  InputDecoration _inputDecoration(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
       filled: true,
-      fillColor: const Color(0xFFE3F2FD), // Azul claro suave
+      fillColor: const Color(0xFFFFF8E7), // Color claro
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8), // Cuadro más cuadrado
+        borderSide: const BorderSide(color: Color(0xFF6D4C41), width: 1.5),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      prefixIcon: Icon(
+        icon,
+        color: const Color(0xFF6D4C41),
+      ),
     );
   }
 
@@ -59,9 +64,9 @@ class _ProveedoresFormState extends State<ProveedoresForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF448AFF), // Azul oscuro
-        title: Row(
-          children: const [
+        backgroundColor: const Color(0xFF6D4C41), // Color de appBar
+        title: const Row(
+          children: [
             Icon(Icons.person, color: Colors.white), // Ícono blanco
             SizedBox(width: 8),
             Text(
@@ -76,31 +81,52 @@ class _ProveedoresFormState extends State<ProveedoresForm> {
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: SafeArea(
+      body: Center( // Usamos el Center widget para centrar el formulario verticalmente
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Card(
-            elevation: 8,
+            elevation: 6,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(16),
             ),
-            color: const Color(0xFFE3F2FD), // Fondo azul claro
+            color: const Color(0xFFFFF8E7), // Fondo del formulario
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  TextFormField(controller: txtNombre, decoration: _inputDecoration('Nombre')),
+                  const Icon(
+                    Icons.person,
+                    size: 50,
+                    color: Color(0xFF6D4C41), // Icono coherente con el tema
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: txtNombre,
+                    decoration: _inputDecoration('Nombre', Icons.person),
+                  ),
                   const SizedBox(height: 16),
-                  TextFormField(controller: txtApellidoP, decoration: _inputDecoration('Apellido Paterno')),
+                  TextFormField(
+                    controller: txtApellidoP,
+                    decoration: _inputDecoration('Apellido Paterno', Icons.text_fields),
+                  ),
                   const SizedBox(height: 16),
-                  TextFormField(controller: txtApellidoM, decoration: _inputDecoration('Apellido Materno')),
+                  TextFormField(
+                    controller: txtApellidoM,
+                    decoration: _inputDecoration('Apellido Materno', Icons.text_fields),
+                  ),
                   const SizedBox(height: 16),
-                  TextFormField(controller: txtTelefono, decoration: _inputDecoration('Teléfono')),
+                  TextFormField(
+                    controller: txtTelefono,
+                    decoration: _inputDecoration('Teléfono', Icons.phone),
+                  ),
                   const SizedBox(height: 16),
-                  TextFormField(controller: txtEmail, decoration: _inputDecoration('Email')),
+                  TextFormField(
+                    controller: txtEmail,
+                    decoration: _inputDecoration('Email', Icons.email),
+                  ),
                   const SizedBox(height: 24),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton.icon(
                         onPressed: () async {
@@ -117,16 +143,24 @@ class _ProveedoresFormState extends State<ProveedoresForm> {
                             headers: {'Content-Type': 'application/json; charset=UTF-8'},
                           );
                           if (response.body == "ok") {
-                            Navigator.push(context, MaterialPageRoute(builder: (_) => const ProveedorPage()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const ProveedorPage()));
                           }
                         },
                         icon: const Icon(Icons.save),
                         label: const Text('Guardar'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2196F3), // Azul medio
+                          backgroundColor: const Color(0xFF8D6E63), // Color coherente con el tema
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                         ),
                       ),
-                      if (widget.idProveedor != 0)
+                      if (widget.idProveedor != 0) ...[
+                        const SizedBox(width: 16),
                         ElevatedButton.icon(
                           onPressed: () async {
                             final response = await http.post(
@@ -135,15 +169,19 @@ class _ProveedoresFormState extends State<ProveedoresForm> {
                               headers: {'Content-Type': 'application/json; charset=UTF-8'},
                             );
                             if (response.body == "ok") {
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => const ProveedorPage()));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const ProveedorPage()));
                             }
                           },
                           icon: const Icon(Icons.delete),
                           label: const Text('Eliminar'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF90A4AE), // Gris azulado
+                            backgroundColor: const Color(0xFF8D6E63), // Gris coherente con el tema
+                            foregroundColor: Colors.white,
                           ),
                         ),
+                      ],
                     ],
                   ),
                 ],
@@ -155,6 +193,3 @@ class _ProveedoresFormState extends State<ProveedoresForm> {
     );
   }
 }
-
-
-

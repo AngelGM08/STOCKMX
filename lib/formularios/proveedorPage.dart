@@ -20,6 +20,7 @@ class ProveedorPage extends StatefulWidget {
 
 class _ProveedorPageState extends State<ProveedorPage> {
   final String _selectedMenu = 'Proveedores';
+  List<ProveedorModel> proveedores = [];
 
   void _onMenuSelected(String menu) {
     if (menu == 'Productos') {
@@ -51,8 +52,6 @@ class _ProveedorPageState extends State<ProveedorPage> {
       );
     }
   }
-
-  List<ProveedorModel> proveedores = [];
 
   void fnGetProveedores() async {
     http.Response response;
@@ -87,30 +86,31 @@ class _ProveedorPageState extends State<ProveedorPage> {
       );
     }
 
-    return ListView.builder(
+    return GridView.builder(
       padding: const EdgeInsets.all(12),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 0.75,
+      ),
       itemCount: proveedores.length,
       itemBuilder: (context, index) {
         final proveedor = proveedores[index];
         return Card(
-          margin: const EdgeInsets.symmetric(vertical: 6),
-          color: const Color(0xFFE3F2FD),
-          elevation: 3,
+          elevation: 6,
+          color: const Color(0xFFFFF8E7), // Mismo color de fondo que en ProductoPage
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
-          child: ListTile(
-            leading: const Icon(Icons.person, color: Color(0xFF448AFF)),
-            title: Text(proveedor.nombre,
-                style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text('Email: ${proveedor.email}'),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
             onTap: () {
               if (Url.rol != 'Administrador' || Url.id == proveedor.idP) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        ProveedoresForm(idProveedor: proveedor.idP),
+                    builder: (context) => ProveedoresForm(idProveedor: proveedor.idP),
                   ),
                 );
               } else {
@@ -121,6 +121,61 @@ class _ProveedorPageState extends State<ProveedorPage> {
                 );
               }
             },
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.person,
+                    size: 40,
+                    color: Color(0xFF6D4C41), // Mismo color que en ProductoPage
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    proveedor.nombre,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Email: ${proveedor.email}',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 13),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Color(0xFF6D4C41)), // Mismo color que en ProductoPage
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ProveedoresForm(idProveedor: proveedor.idP),
+                            ),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.redAccent),
+                        onPressed: () {
+                          // Llamar función para eliminar proveedor
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
         );
       },
@@ -141,22 +196,17 @@ class _ProveedorPageState extends State<ProveedorPage> {
         onItemSelected: _onMenuSelected,
       ),
       appBar: AppBar(
+        backgroundColor: const Color(0xFF6D4C41), // Mismo color que en ProductoPage
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           'Proveedores',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF448AFF), // Azul seleccionado
-        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFFE3F2FD), // Azul claro arriba
-              Color(0xFFFFFFFF), // Blanco abajo
-            ],
+            colors: [Color(0xFFFFF8E7), Color(0xFFFFFFFF)], // Mismo fondo de gradiente que en ProductoPage
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -164,20 +214,20 @@ class _ProveedorPageState extends State<ProveedorPage> {
         child: _listViewProveedor(),
       ),
       floatingActionButton: (Url.rol != 'Proveedor' && Url.rol != 'Cliente')
-          ? FloatingActionButton(
-              backgroundColor: const Color(0xFF448AFF), // Botón azul
+          ? FloatingActionButton.extended(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ProveedoresForm(idProveedor: 0),
+                    builder: (_) => const ProveedoresForm(idProveedor: 0),
                   ),
                 );
               },
-              child: const Icon(Icons.add, color: Colors.white),
+              label: const Text('Agregar'),
+              icon: const Icon(Icons.add),
+              backgroundColor: const Color(0xFF8D6E63), // Mismo color que en ProductoPage
             )
           : null,
     );
   }
 }
-
