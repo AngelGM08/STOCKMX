@@ -29,14 +29,19 @@ class _InsumoFormState extends State<InsumoForm> {
         headers: {'Content-Type': 'application/json'},
       );
 
+      if (!mounted) return;
+
       if (responseProduccion.statusCode == 200 &&
           responseCompra.statusCode == 200) {
-        producciones = jsonDecode(responseProduccion.body);
-        compras = jsonDecode(responseCompra.body);
+        setState(() {
+          producciones = jsonDecode(responseProduccion.body);
+          compras = jsonDecode(responseCompra.body);
+        });
       } else {
         throw Exception('Error en los códigos de estado');
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al cargar listas: $e')),
       );
@@ -47,23 +52,32 @@ class _InsumoFormState extends State<InsumoForm> {
     try {
       final response = await http
           .get(Uri.parse('${Url.urlServer}/api/insumos/${widget.idInsumo}'));
+
+      if (!mounted) return;
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        selectedProduccion = data['id_produccion'];
-        selectedCompra = data['id_compra'];
-        txtCantidad.text = data['cantidad_usada'].toString();
+        setState(() {
+          selectedProduccion = data['id_produccion'];
+          selectedCompra = data['id_compra'];
+          txtCantidad.text = data['cantidad_usada'].toString();
+        });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error al cargar: $e')));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cargar: $e')),
+      );
     }
   }
 
   Future<void> inicializarFormulario() async {
     await cargarListas();
+    if (!mounted) return;
     if (widget.idInsumo != 0) {
       await cargarInsumo();
     }
+    if (!mounted) return;
     setState(() {
       isLoading = false;
     });
@@ -97,6 +111,8 @@ class _InsumoFormState extends State<InsumoForm> {
             body: jsonEncode(body),
             headers: {'Content-Type': 'application/json'});
 
+    if (!mounted) return;
+
     if (response.statusCode == 200 || response.statusCode == 201) {
       Navigator.pushReplacement(
         context,
@@ -118,68 +134,109 @@ class _InsumoFormState extends State<InsumoForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Formulario Insumo')),
+      appBar: AppBar(
+        title: const Text('📦 Insumo'),
+        backgroundColor: const Color(0xFF6D4C41),
+        foregroundColor: Colors.white,
+      ),
+      backgroundColor: const Color(0xFFF5F5F5),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(12),
-              children: [
-                const Text('Producción'),
-                DropdownButtonFormField<int>(
-                  value: producciones
-                          .any((prod) => prod['id_produccion'] == selectedProduccion)
-                      ? selectedProduccion
-                      : null,
-                  items: producciones.map<DropdownMenuItem<int>>((prod) {
-                    final tamal = prod['tamal'];
-                    final nombreTamal = tamal != null
-                        ? tamal['nombre_tamal'] ?? 'Desconocido'
-                        : 'Sin tamal';
-                    final fecha = prod['fecha'] ?? 'Fecha no disponible';
-                    return DropdownMenuItem<int>(
-                      value: prod['id_produccion'],
-                      child: Text('Tamal: $nombreTamal - Fecha: $fecha'),
-                    );
-                  }).toList(),
-                  onChanged: (val) => setState(() => selectedProduccion = val),
-                  decoration:
-                      const InputDecoration(border: OutlineInputBorder()),
+          : Center(
+              child: SizedBox(
+                width: 360,
+                child: Card(
+                  margin: const EdgeInsets.all(16),
+                  color: const Color(0xFFFFF8E7),
+                  elevation: 6,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.inventory,
+                            size: 50, color: Color(0xFF6D4C41)),
+                        const SizedBox(height: 12),
+                        DropdownButtonFormField<int>(
+                          value: selectedProduccion,
+                          items: producciones.map<DropdownMenuItem<int>>((prod) {
+                            final tamal = prod['tamal'];
+                            final nombreTamal = tamal != null
+                                ? tamal['nombre_tamal'] ?? 'Desconocido'
+                                : 'Sin tamal';
+                            
+                            return DropdownMenuItem<int>(
+                              value: prod['id_produccion'],
+                              child: Text(
+                                'Tamal: $nombreTamal',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (val) =>
+                              setState(() => selectedProduccion = val),
+                          decoration: const InputDecoration(
+                            labelText: 'Producción',
+                            prefixIcon: Icon(Icons.kitchen),
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        DropdownButtonFormField<int>(
+                          value: selectedCompra,
+                          items: compras.map<DropdownMenuItem<int>>((compra) {
+                            final producto = compra['producto'];
+                            final nombreProd = producto != null
+                                ? producto['nombre_prod'] ?? 'Desconocido'
+                                : 'Sin producto';
+                            return DropdownMenuItem<int>(
+                              value: compra['id_compra'],
+                              child: Text(
+                                'Producto: $nombreProd',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (val) =>
+                              setState(() => selectedCompra = val),
+                          decoration: const InputDecoration(
+                            labelText: 'Compra',
+                            prefixIcon: Icon(Icons.shopping_cart),
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: txtCantidad,
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          decoration: const InputDecoration(
+                            labelText: 'Cantidad usada',
+                            prefixIcon: Icon(Icons.scale),
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF8D6E63),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 12),
+                          ),
+                          onPressed: guardarInsumo,
+                          icon: const Icon(Icons.save),
+                          label: const Text('Guardar'),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 10),
-                const Text('Compra'),
-                DropdownButtonFormField<int>(
-                  value: compras
-                          .any((compra) => compra['id_compra'] == selectedCompra)
-                      ? selectedCompra
-                      : null,
-                  items: compras.map<DropdownMenuItem<int>>((compra) {
-                    final producto = compra['producto'];
-                    final nombreProd = producto != null
-                        ? producto['nombre_prod'] ?? 'Desconocido'
-                        : 'Sin producto';
-                    return DropdownMenuItem<int>(
-                      value: compra['id_compra'],
-                      child: Text('Producto: $nombreProd'),
-                    );
-                  }).toList(),
-                  onChanged: (val) => setState(() => selectedCompra = val),
-                  decoration:
-                      const InputDecoration(border: OutlineInputBorder()),
-                ),
-                const SizedBox(height: 10),
-                const Text('Cantidad Usada'),
-                TextField(
-                  controller: txtCantidad,
-                  keyboardType: TextInputType.number,
-                  decoration:
-                      const InputDecoration(border: OutlineInputBorder()),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: guardarInsumo,
-                  child: const Text('Guardar'),
-                ),
-              ],
+              ),
             ),
     );
   }
