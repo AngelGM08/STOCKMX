@@ -18,6 +18,7 @@ class _TamalesFormState extends State<TamalesForm> {
   final TextEditingController txtDescripcion = TextEditingController();
   bool isLoading = false;
 
+  // Función para cargar el tamal
   Future<void> cargarTamal() async {
     setState(() => isLoading = true);
     try {
@@ -50,6 +51,7 @@ class _TamalesFormState extends State<TamalesForm> {
     }
   }
 
+  // Función para enviar el tamal
   Future<void> enviarTamal() async {
     if (txtNomTam.text.isEmpty || txtDescripcion.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -92,6 +94,7 @@ class _TamalesFormState extends State<TamalesForm> {
     }
   }
 
+  // Función para eliminar el tamal
   Future<void> eliminarTamal() async {
     setState(() => isLoading = true);
     try {
@@ -122,7 +125,6 @@ class _TamalesFormState extends State<TamalesForm> {
     }
   }
 
-
   @override
   void initState() {
     super.initState();
@@ -134,25 +136,92 @@ class _TamalesFormState extends State<TamalesForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tamales')),
+      appBar: AppBar(
+        title: const Text('🫔 Tamales'),
+        backgroundColor: const Color(0xFF6D4C41), // Color café para el AppBar
+      ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              children: [
-                const Text('Nombre del Tamal: '),
-                TextFormField(controller: txtNomTam),
-                const Text('Descripcion: '),
-                TextFormField(controller: txtDescripcion),
-                TextButton(
-                  onPressed: enviarTamal,
-                  child: const Text('Guardar'),
-                ),
-                if (widget.idTamal != 0)
-                  ElevatedButton(
-                    onPressed: eliminarTamal,
-                    child: const Text('Eliminar'),
+          : SingleChildScrollView(
+              child: Center(
+                child: Card(
+                  margin: const EdgeInsets.all(16),
+                  color: const Color(0xFFFFF8E7), // Color de fondo para el card
+                  elevation: 6,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
-              ],
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.fastfood,
+                          size: 50,
+                          color: Color(0xFF6D4C41), // Ícono con color café
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller:
+                              txtNomTam, // Controlador para nombre del tamal
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Ingrese el nombre del tamal',
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller:
+                              txtDescripcion, // Controlador para la descripción
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Descripción del tamal',
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(
+                              0xFF6D4C41,
+                            ), // Color café para el botón
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                          ),
+                          onPressed: enviarTamal, // Acción de enviar tamal
+                          icon: const Icon(Icons.save),
+                          label: const Text('Guardar'),
+                        ),
+                        if (widget.idTamal != 0) ...[
+                          const SizedBox(height: 12),
+                          ElevatedButton(
+                            onPressed:
+                                eliminarTamal, // Acción de eliminar tamal
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors
+                                  .redAccent, // Botón de eliminación en rojo
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                            ),
+                            child: const Text('Eliminar'),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
     );
   }

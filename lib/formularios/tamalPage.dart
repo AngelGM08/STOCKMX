@@ -21,6 +21,8 @@ class TamalPage extends StatefulWidget {
 class _TamalPageState extends State<TamalPage> {
   final String _selectedMenu = 'Tamales';
 
+  List<TamalModel> tamales = [];
+
   /// 🔹 Manejo de navegación desde el Drawer
   void _onMenuSelected(String menu) {
     if (menu == 'Proveedores') {
@@ -38,7 +40,7 @@ class _TamalPageState extends State<TamalPage> {
         context,
         MaterialPageRoute(builder: (_) => const ProductoPage()),
       );
-    }else if (menu == 'Producción') {
+    } else if (menu == 'Producción') {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const ProduccionPage()),
@@ -53,9 +55,7 @@ class _TamalPageState extends State<TamalPage> {
     }
   }
 
-  List<TamalModel> tamales = [];
-
-  /// 🔹 Obtiene productos desde la API
+  /// 🔹 Obtiene los tamales desde la API
   void fnGetTamal() async {
     http.Response response;
     if (Url.rol == 'Proveedor') {
@@ -79,50 +79,152 @@ class _TamalPageState extends State<TamalPage> {
     setState(() {});
   }
 
-  /// 🔹 Construye la lista de productos
-  Widget _listViewProducto() {
+  /// 🔹 Construye la lista de tamales con el diseño actualizado
+  Widget _listViewTamales() {
     if (tamales.isEmpty) {
       return const Center(child: Text('No hay tamales disponibles'));
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(8),
+    return GridView.builder(
+      padding: const EdgeInsets.all(12),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount:
+            2, // Puedes cambiar esto a 1 si prefieres mostrar en una columna
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio:
+            0.75, // Ajustar la relación de aspecto para que se vea bien
+      ),
       itemCount: tamales.length,
       itemBuilder: (context, index) {
         final tamal = tamales[index];
         return Card(
-          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+          elevation: 6,
+          color: const Color(
+            0xFFFFF8E7,
+          ), // Color de fondo similar al de productos
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
-          elevation: 3,
-          child: ListTile(
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
             onTap: () {
-              if (Url.rol != 'Administrador' || Url.id == tamal.idT) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        TamalesForm(idTamal: tamal.idT),
-                  ),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'No tienes permiso para editar este tamal.',
-                    ),
-                  ),
-                );
-              }
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => TamalesForm(idTamal: tamal.idT),
+                ),
+              );
             },
-            title: Text(tamal.nomT),
-            subtitle: Text(
-              'Descripción: ${tamal.descripcion}'),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.fastfood,
+                    size: 40,
+                    color: Color(
+                      0xFF6D4C41,
+                    ), // Color de ícono similar al de productos
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    tamal.nomT,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    tamal.descripcion,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 13),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Color(0xFF6D4C41)),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => TamalesForm(idTamal: tamal.idT),
+                            ),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.redAccent),
+                        onPressed: () {
+                          eliminarTamal(tamal.idT);
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
         );
       },
     );
+  }
+
+  /// 🔹 Función para eliminar un tamal
+  Future<void> eliminarTamal(int idTamal) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Eliminar tamal?'),
+        content: const Text('Esta acción no se puede deshacer.'),
+        actions: [
+          TextButton(
+            child: const Text('Cancelar'),
+            onPressed: () => Navigator.pop(context, false),
+          ),
+          ElevatedButton(
+            child: const Text('Eliminar'),
+            onPressed: () => Navigator.pop(context, true),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      final url = Uri.parse('${Url.urlServer}/api/tamal/eliminar');
+      final response = await http.post(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({'id': idTamal}),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          tamales.removeWhere((t) => t.idT == idTamal);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Tamal eliminado correctamente')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error al eliminar: $e')));
+    }
   }
 
   @override
@@ -134,36 +236,33 @@ class _TamalPageState extends State<TamalPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /// ✅ Drawer compartido
       drawer: MainDrawer(
         selectedMenu: _selectedMenu,
         onItemSelected: _onMenuSelected,
       ),
-
-      /// ✅ AppBar consistente
       appBar: AppBar(
         title: const Text('Tamales'),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: const Color(
+          0xFF6D4C41,
+        ), // Color café en la parte superior
       ),
-
-      /// ✅ Fondo con gradiente
       body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFE3F2FD), Color(0xFFFFFFFF)],
+            colors: [
+              Color(0xFFE3F2FD),
+              Color(0xFFFFFFFF),
+            ], // Gradiente de fondo
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
         ),
-        child: _listViewProducto(),
+        child: _listViewTamales(),
       ),
-
-      /// ✅ Botón flotante solo para roles permitidos
       floatingActionButton: (Url.rol != 'Proveedor' && Url.rol != 'Cliente')
-          ? FloatingActionButton(
-              backgroundColor: Colors.red.shade100,
+          ? FloatingActionButton.extended(
               onPressed: () {
                 Navigator.push(
                   context,
@@ -172,7 +271,11 @@ class _TamalPageState extends State<TamalPage> {
                   ),
                 );
               },
-              child: const Icon(Icons.add, color: Colors.black87),
+              label: const Text('Agregar'),
+              icon: const Icon(Icons.add),
+              backgroundColor: const Color(
+                0xFF6D4C41,
+              ), // Aquí se cambia al color café
             )
           : null,
     );
