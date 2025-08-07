@@ -227,12 +227,31 @@ class _ComprasFormState extends State<ComprasForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Compras')),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
+      appBar: AppBar(
+        title: const Text('🛒 Compras'),
+        backgroundColor: const Color(0xFF6D4C41),
+        foregroundColor: Colors.white,
+      ),
+      backgroundColor: const Color(0xFFF5F5F5),
+      body: Center(
+        child: Card(
+          margin: const EdgeInsets.all(16),
+          color: const Color(0xFFFFF8E7),
+          elevation: 6,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Proveedor: '),
+                const Icon(
+                  Icons.shopping_cart,
+                  size: 50,
+                  color: Color(0xFF6D4C41),
+                ),
+                const SizedBox(height: 12),
                 DropdownButton<String>(
                   value: selectedProveedorId,
                   hint: const Text('Selecciona un Proveedor'),
@@ -253,7 +272,7 @@ class _ComprasFormState extends State<ComprasForm> {
                     );
                   }).toList(),
                 ),
-                const Text('Producto: '),
+                const SizedBox(height: 12),
                 DropdownButton<String>(
                   value: selectedProductoId,
                   hint: const Text('Selecciona un Producto'),
@@ -261,13 +280,10 @@ class _ComprasFormState extends State<ComprasForm> {
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedProductoId = newValue;
-                      // Buscar el producto seleccionado y asignar su precio unitario
                       final productoSel = productos.firstWhere(
                         (prod) => prod.idProd.toString() == newValue,
                       );
-                      precioUnitario = productoSel
-                          .precioU; // Asegúrate que precioU sea double
-                      // Recalcular total si ya hay cantidad escrita
+                      precioUnitario = productoSel.precioU;
                       if (txtCantidad.text.isNotEmpty) {
                         calcularTotal();
                       }
@@ -284,10 +300,18 @@ class _ComprasFormState extends State<ComprasForm> {
                     );
                   }).toList(),
                 ),
-                const Text('Cantidad: '),
-                TextFormField(controller: txtCantidad),
-                const Text('Unidad: '),
-                DropdownButtonFormField(
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: txtCantidad,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Cantidad',
+                    prefixIcon: Icon(Icons.shopping_basket),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
                   value: unidadSel,
                   hint: const Text('Selecciona una unidad'),
                   items: unidad
@@ -297,20 +321,51 @@ class _ComprasFormState extends State<ComprasForm> {
                       .toList(),
                   onChanged: (value) => setState(() => unidadSel = value),
                 ),
-                const Text('Total: '),
-                TextFormField(controller: txtTotal),
-
-                TextButton(
-                  onPressed: enviarCompra,
-                  child: const Text('Guardar'),
-                ),
-                if (widget.idCompra != 0)
-                  ElevatedButton(
-                    onPressed: eliminarCompra,
-                    child: const Text('Eliminar'),
+                const SizedBox(height: 12),
+                const Text('Total:'),
+                TextFormField(
+                  controller: txtTotal,
+                  keyboardType: TextInputType.number,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Total',
+                    prefixIcon: Icon(Icons.attach_money),
+                    border: OutlineInputBorder(),
                   ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF8D6E63),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                  ),
+                  onPressed: enviarCompra,
+                  icon: const Icon(Icons.save),
+                  label: const Text('Guardar'),
+                ),
+                if (widget.idCompra != 0) ...[
+                  const SizedBox(height: 12),
+                  TextButton.icon(
+                    onPressed: eliminarCompra,
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    label: const Text(
+                      'Eliminar',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ],
               ],
             ),
+          ),
+        ),
+      ),
     );
   }
 }

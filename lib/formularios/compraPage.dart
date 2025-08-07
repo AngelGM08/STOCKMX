@@ -53,7 +53,7 @@ class _CompraPageState extends State<CompraPage> {
         context,
         MaterialPageRoute(builder: (_) => const ProduccionPage()),
       );
-    }else if (menu == 'Compras') {
+    } else if (menu == 'Compras') {
       return;
     } else {
       Navigator.pushReplacement(
@@ -154,13 +154,27 @@ class _CompraPageState extends State<CompraPage> {
   }
 
   /// 🔹 Construye la lista de compras
+  /// 🔹 Construye la lista de compras con un diseño similar al de productos
   Widget _listViewCompras() {
     if (compras.isEmpty) {
-      return const Center(child: Text('No hay compras disponibles'));
+      return const Center(
+        child: Text(
+          'No hay compras disponibles',
+          style: TextStyle(fontSize: 16, color: Colors.black54),
+        ),
+      );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(8),
+    return GridView.builder(
+      padding: const EdgeInsets.all(12),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount:
+            2, // Cambiar esto a 1 si prefieres mostrar en una columna
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio:
+            0.75, // Ajustar la relación de aspecto para que se vea bien
+      ),
       itemCount: compras.length,
       itemBuilder: (context, index) {
         final compra = compras[index];
@@ -168,37 +182,138 @@ class _CompraPageState extends State<CompraPage> {
         final productoNombre = getNombreProducto(compra.idProd);
 
         return Card(
-          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+          elevation: 6,
+          color: const Color(
+            0xFFFFF8E7,
+          ), // Color de fondo similar al de productos
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
-          elevation: 3,
-          child: ListTile(
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
             onTap: () {
-              if (Url.rol != 'Administrador' || Url.id == compra.idCompra) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ComprasForm(idCompra: compra.idCompra),
-                  ),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('No tienes permiso para editar esta compra.'),
-                  ),
-                );
-              }
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ComprasForm(idCompra: compra.idCompra),
+                ),
+              );
             },
-            title: Text('$productoNombre - $proveedorNombre'),
-            subtitle: Text(
-              'Cantidad: ${compra.cantidad} ${compra.unidad}\n'
-              'Total: \$${compra.total.toStringAsFixed(2)}',
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.shopping_cart,
+                    size: 40,
+                    color: Color(
+                      0xFF6D4C41,
+                    ), // Usando un color similar al de productos
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '$productoNombre - $proveedorNombre',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Cantidad: ${compra.cantidad} ${compra.unidad}',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 13),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Total: \$${compra.total.toStringAsFixed(2)}',
+                    style: const TextStyle(fontSize: 16, color: Colors.black87),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Color(0xFF6D4C41)),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  ComprasForm(idCompra: compra.idCompra),
+                            ),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.redAccent),
+                        onPressed: () {
+                          // Llamar a la función para eliminar la compra (si es necesario)
+                          eliminarCompra(compra.idCompra);
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         );
       },
     );
+  }
+
+  Future<void> eliminarCompra(int idCompra) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Eliminar compra?'),
+        content: const Text('Esta acción no se puede deshacer.'),
+        actions: [
+          TextButton(
+            child: const Text('Cancelar'),
+            onPressed: () => Navigator.pop(context, false),
+          ),
+          ElevatedButton(
+            child: const Text('Eliminar'),
+            onPressed: () => Navigator.pop(context, true),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      final url = Uri.parse('${Url.urlServer}/api/compra/eliminar');
+      final response = await http.post(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({'id': idCompra}),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          compras.removeWhere((compra) => compra.idCompra == idCompra);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Compra eliminada correctamente')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error al eliminar: $e')));
+    }
   }
 
   @override
@@ -217,8 +332,8 @@ class _CompraPageState extends State<CompraPage> {
         onItemSelected: _onMenuSelected,
       ),
       appBar: AppBar(
-        title: const Text('Compras'),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: const Color(0xFF6D4C41),
+        title: const Text('Compras', style: TextStyle(color: Colors.white)),
       ),
       body: Container(
         width: double.infinity,
@@ -233,17 +348,18 @@ class _CompraPageState extends State<CompraPage> {
         child: _listViewCompras(),
       ),
       floatingActionButton: (Url.rol != 'Proveedor' && Url.rol != 'Cliente')
-          ? FloatingActionButton(
-              backgroundColor: Colors.red.shade100,
+          ? FloatingActionButton.extended(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ComprasForm(idCompra: 0),
+                    builder: (_) => const ComprasForm(idCompra: 0),
                   ),
                 );
               },
-              child: const Icon(Icons.add, color: Colors.black87),
+              label: const Text('Agregar'),
+              icon: const Icon(Icons.add),
+              backgroundColor: const Color(0xFF8D6E63),
             )
           : null,
     );
