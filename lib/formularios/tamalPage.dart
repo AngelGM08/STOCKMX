@@ -9,6 +9,7 @@ import 'package:stockmx/formularios/produccionPage.dart';
 import 'package:stockmx/formularios/productoPage.dart';
 import 'package:stockmx/formularios/proveedorPage.dart';
 import 'package:stockmx/formularios/tamales.dart';
+import 'package:stockmx/formularios/insumoPage.dart';
 import 'package:stockmx/home.dart';
 
 class TamalPage extends StatefulWidget {
@@ -45,7 +46,13 @@ class _TamalPageState extends State<TamalPage> {
         context,
         MaterialPageRoute(builder: (_) => const ProduccionPage()),
       );
-    } else if (menu == 'Tamales') {
+    } 
+     else if (menu == 'Insumos') {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const InsumoPage()),
+    );
+  }else if (menu == 'Tamales') {
       return;
     } else {
       Navigator.pushReplacement(

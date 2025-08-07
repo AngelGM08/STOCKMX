@@ -10,6 +10,7 @@ import 'package:stockmx/formularios/productos.dart';
 import 'package:stockmx/formularios/proveedorPage.dart';
 import 'package:stockmx/formularios/tamalPage.dart';
 import 'package:stockmx/home.dart';
+import 'package:stockmx/formularios/insumoPage.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 
@@ -46,7 +47,13 @@ class _ProductoPageState extends State<ProductoPage> {
         context,
         MaterialPageRoute(builder: (_) => const ProduccionPage()),
       );
-    } else if (menu == 'Productos') {
+    } 
+     else if (menu == 'Insumos') {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const InsumoPage()),
+    );
+  }else if (menu == 'Productos') {
       return;
     } else {
       Navigator.pushReplacement(

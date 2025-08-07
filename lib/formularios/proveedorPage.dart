@@ -9,6 +9,7 @@ import 'package:stockmx/formularios/produccionPage.dart';
 import 'package:stockmx/formularios/productoPage.dart';
 import 'package:stockmx/formularios/proveedores.dart';
 import 'package:stockmx/formularios/tamalPage.dart';
+import 'package:stockmx/formularios/insumoPage.dart';
 import 'package:stockmx/home.dart';
 
 class ProveedorPage extends StatefulWidget {
@@ -43,7 +44,13 @@ class _ProveedorPageState extends State<ProveedorPage> {
         context,
         MaterialPageRoute(builder: (_) => const ProduccionPage()),
       );
-    } else if (menu == 'Proveedores') {
+    } 
+     else if (menu == 'Insumos') {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const InsumoPage()),
+    );
+  }else if (menu == 'Proveedores') {
       return;
     } else {
       Navigator.pushReplacement(
