@@ -1,0 +1,52 @@
+AVISO DE PRIVACIDAD INTEGRAL – StockMX
+Fecha de última actualización: 9 de julio de 2025
+Con fundamento en los artículos 15 y 16 de la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP), y en cumplimiento de los principios establecidos tanto en la legislación mexicana como en buenas prácticas internacionales de privacidad y protección de datos, hacemos de su conocimiento lo siguiente:
+1. Responsable del tratamiento de los datos personales
+StockMX, con domicilio en [incluir domicilio fiscal o administrativo], es responsable del tratamiento y resguardo de los datos personales que se recaben a través de su plataforma digital para la gestión de inventarios y operaciones del restaurante.
+2. Datos personales que se recaban
+Recabamos los siguientes datos personales, según la relación con el sistema:
+a)	Clientes (en caso de registrar pedidos o reservas):
+Nombre completo
+Domicilio completo (calle, número, colonia, CP, ciudad, estado)
+Teléfono y correo electrónico
+b)	Proveedores:
+Nombre y apellidos (personas físicas)
+Razón social (personas morales)
+RFC
+Datos de contacto: teléfono, correo, dirección
+Datos bancarios para pagos
+c)	Empleados/usuarios del sistema:
+Nombre completo
+Rol dentro del sistema (administrador, inventarista, consultor)
+Credenciales de acceso (usuario, correo, contraseña encriptada)
+3. Finalidades del tratamiento
+Los datos recabados se utilizan para:
+o	Gestionar operaciones internas del restaurante
+o	Realizar pedidos a proveedores
+o	Registrar inventario, compras, ventas y producción
+o	Emitir comprobantes o facturas
+o	Mantener contacto y enviar notificaciones relacionadas con el sistema
+o	Controlar accesos mediante usuarios y contraseñas
+4. Transferencia de datos
+Los datos personales no serán compartidos con terceros sin su consentimiento, salvo que lo exija una autoridad legalmente facultada. StockMX podrá compartir datos con proveedores tecnológicos únicamente para fines de almacenamiento en la nube, garantizando que cumplan con estándares internacionales de seguridad.
+5. Medidas de seguridad
+StockMX aplica medidas de seguridad físicas, administrativas y técnicas para proteger los datos personales:
+o	Encriptación de información sensible
+o	Accesos restringidos por roles
+o	Bitácoras de cambios y accesos
+o	Respaldo automático de información
+o	Protección contra accesos no autorizados
+6. Derechos ARCO (Acceso, Rectificación, Cancelación y Oposición)
+Usted tiene derecho a:
+Conocer los datos personales que poseemos de usted
+Solicitar la corrección de datos inexactos o incompletos
+Cancelar sus datos cuando considere que no se requieren para alguna de las finalidades
+Oponerse al uso de sus datos para fines específicos
+Puede ejercer sus derechos enviando una solicitud al correo: contacto@stockmx.com indicando:
+Nombre completo y relación con el sistema
+Descripción clara de los datos o acción que solicita
+7. Uso de cookies y tecnologías similares
+La aplicación puede utilizar tecnologías de seguimiento con fines estadísticos y de mejora del servicio. No se utilizan cookies para fines publicitarios ni se vinculan con terceros.
+8. Cambios al aviso de privacidad
+StockMX podrá modificar este aviso para cumplir con nuevas disposiciones legales o por mejoras internas. Los cambios se notificarán mediante la aplicación o al ingresar por primera vez tras su modificación.
+StockMX agradece su confianza y se compromete a proteger la información personal bajo los más altos estándares de responsabilidad, legalidad y transparencia.

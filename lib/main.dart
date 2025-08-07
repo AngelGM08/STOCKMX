@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       //home: const ProductoPage  (), // ← Empieza en login
-      home: const HomePage  (), // Lo cambie para que nos muestre el menú pero deberia ser el login
+      home: const LoginPage  (), // Lo cambie para que nos muestre el menú pero deberia ser el login
       debugShowCheckedModeBanner: false,
     );
   }

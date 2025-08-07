@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stockmx/aviso_privacidad_page.dart';
 
 class MainDrawer extends StatelessWidget {
   final String selectedMenu;
@@ -20,7 +21,7 @@ class MainDrawer extends StatelessWidget {
           selectedTileColor: Colors.blueAccent.withOpacity(0.2),
           onTap: () {
             Navigator.pop(context); // Cierra el Drawer
-            onItemSelected(title);  // Notifica a la página cuál opción se seleccionó
+            onItemSelected(title);  // Notifica la selección
           },
         );
       },
@@ -30,10 +31,11 @@ class MainDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: Column(
+      child: ListView(
+        padding: EdgeInsets.zero,
         children: [
-          DrawerHeader(
-            decoration: const BoxDecoration(
+          const DrawerHeader(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [Color(0xFF1E88E5), Color(0xFF90CAF9)],
                 begin: Alignment.topLeft,
@@ -41,7 +43,7 @@ class MainDrawer extends StatelessWidget {
               ),
             ),
             child: Row(
-              children: const [
+              children: [
                 Icon(Icons.store, color: Colors.white, size: 40),
                 SizedBox(width: 10),
                 Text(
@@ -58,6 +60,23 @@ class MainDrawer extends StatelessWidget {
           _buildDrawerItem(Icons.shopping_cart, 'Compras'),
           _buildDrawerItem(Icons.rice_bowl, 'Tamales'),
           _buildDrawerItem(Icons.factory, 'Producción'),
+
+          const Divider(),
+
+          // 🔐 Aviso de Privacidad
+          ListTile(
+            leading: const Icon(Icons.privacy_tip, color: Colors.grey),
+            title: const Text('Aviso de Privacidad'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AvisoPrivacidadPage(),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
